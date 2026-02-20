@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Ganadero Profesional</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0f0f1a;
+  --panel:    #181828;
+  --panel2:   #1e1e32;
+  --border:   #2a2a45;
+  --accent:   #7c3aed;
+  --accent2:  #059669;
+  --orange:   #ea580c;
+  --text:     #e8e8f0;
+  --text2:    #7070a0;
+  --input-bg: #232338;
+  --calc-bg:  #1a1200;
+  --calc-fg:  #fb923c;
+  --red:      #dc2626;
+  --blue:     #2563eb;
+  --radius:   12px;
+  --shadow:   0 4px 24px rgba(0,0,0,.4);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background:linear-gradient(135deg,#4c1d95,#7c3aed);
+  padding:14px 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+  box-shadow:0 2px 20px rgba(124,58,237,.4);
+}
+.topbar-title { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; letter-spacing:.5px; }
+.topbar-meta  { font-size:.78rem; color:#c4b5fd; }
+
+/* ── LEYENDA ── */
+.leyenda {
+  background:var(--calc-bg);
+  border-bottom:1px solid #7c2d00;
+  padding:7px 20px;
+  font-size:.78rem; color:var(--calc-fg); font-weight:600;
+}
+
+/* ── TABS ── */
+.tabs {
+  display:flex; gap:4px; padding:12px 16px 0;
+  border-bottom:1px solid var(--border);
+  overflow-x:auto; scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar { display:none; }
+.tab {
+  padding:9px 18px; border-radius:8px 8px 0 0;
+  background:var(--panel2); color:var(--text2);
+  border:1px solid var(--border); border-bottom:none;
+  cursor:pointer; font-family:'Syne',sans-serif;
+  font-size:.82rem; font-weight:600; white-space:nowrap;
+  transition:all .2s;
+}
+.tab:hover  { color:var(--text); background:var(--panel); }
+.tab.active { background:var(--panel); color:#a78bfa; border-color:var(--accent); }
+
+/* ── LAYOUT ── */
+.content { padding:20px 16px; max-width:1400px; margin:0 auto; }
+
+/* Desktop: 3 columnas */
+@media(min-width:900px){
+  .grid3 { display:grid; grid-template-columns:1fr 260px 1fr; gap:16px; }
+}
+@media(max-width:899px){
+  .grid3 > * { margin-bottom:16px; }
+}
+
+/* ── PANEL ── */
+.panel {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.panel-header {
+  background:linear-gradient(135deg,#4c1d95,#7c3aed);
+  padding:13px 18px;
+  font-family:'Syne',sans-serif;
+  font-weight:700; font-size:.95rem; letter-spacing:.3px;
+}
+.panel-body { padding:16px; }
+
+/* ── CAMPO ── */
+.campo { margin-bottom:10px; }
+.campo label {
+  display:block; font-size:.75rem; color:var(--text2);
+  margin-bottom:4px; font-weight:500;
+}
+.campo label.calc-label { color:var(--calc-fg); font-weight:700; }
+.campo input {
+  width:100%; padding:9px 12px;
+  background:var(--input-bg); border:1.5px solid var(--border);
+  border-radius:8px; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:.88rem;
+  transition:border-color .2s, box-shadow .2s;
+  outline:none;
+}
+.campo input:focus {
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(124,58,237,.15);
+}
+.campo input.calc-input {
+  background:var(--calc-bg);
+  border-color:#7c2d00;
+  color:var(--calc-fg);
+  font-weight:700; cursor:default;
+}
+.campo input.calc-input:focus { box-shadow:none; border-color:#ea580c; }
+
+.divider { height:1px; background:var(--border); margin:14px 0; }
+.section-label {
+  font-size:.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:1px; color:var(--text2); margin-bottom:8px;
+}
+.section-label.calc { color:var(--calc-fg); }
+
+/* ── BOTONES ── */
+.btn {
+  width:100%; padding:10px; border:none; border-radius:9px;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:.82rem;
+  cursor:pointer; transition:all .18s; margin-bottom:7px;
+  letter-spacing:.3px;
+}
+.btn:active { transform:scale(.97); }
+.btn-green  { background:#065f46; color:#6ee7b7; }
+.btn-green:hover  { background:#059669; color:#fff; }
+.btn-orange { background:#7c2d12; color:#fdba74; }
+.btn-orange:hover { background:#ea580c; color:#fff; }
+.btn-purple { background:#4c1d95; color:#c4b5fd; }
+.btn-purple:hover { background:#7c3aed; color:#fff; }
+.btn-dark-green { background:#14532d; color:#86efac; }
+.btn-dark-green:hover { background:#16a34a; color:#fff; }
+.btn-blue { background:#1e3a8a; color:#93c5fd; }
+.btn-blue:hover { background:#2563eb; color:#fff; }
+.btn-red  { background:#7f1d1d; color:#fca5a5; }
+.btn-red:hover  { background:#dc2626; color:#fff; }
+
+/* ── TABLA ── */
+.tabla-wrap { overflow-x:auto; }
+table {
+  width:100%; border-collapse:collapse;
+  font-size:.78rem;
+}
+thead th {
+  background:#4c1d95; color:#e9d5ff;
+  padding:9px 10px; font-family:'Syne',sans-serif;
+  font-weight:700; font-size:.72rem;
+  text-transform:uppercase; letter-spacing:.5px;
+  white-space:nowrap; text-align:center;
+}
+tbody tr { border-bottom:1px solid var(--border); transition:background .15s; }
+tbody tr:hover { background:var(--panel2); }
+tbody tr:nth-child(even) { background:rgba(124,58,237,.04); }
+tbody td {
+  padding:8px 10px; text-align:center;
+  color:var(--text); white-space:nowrap;
+}
+.td-actions { display:flex; gap:5px; justify-content:center; }
+.btn-sm {
+  padding:4px 10px; border:none; border-radius:6px;
+  font-size:.72rem; font-weight:700; cursor:pointer;
+  font-family:'Syne',sans-serif; transition:all .15s;
+}
+.btn-sm:active { transform:scale(.95); }
+.btn-sm.edit   { background:#78350f; color:#fcd34d; }
+.btn-sm.edit:hover   { background:#d97706; color:#fff; }
+.btn-sm.del    { background:#7f1d1d; color:#fca5a5; }
+.btn-sm.del:hover    { background:#dc2626; color:#fff; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.7); z-index:200;
+  align-items:center; justify-content:center;
+  padding:16px;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--radius); width:100%; max-width:560px;
+  max-height:90vh; overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+.modal-header {
+  background:linear-gradient(135deg,#4c1d95,#7c3aed);
+  padding:14px 18px;
+  font-family:'Syne',sans-serif; font-weight:700;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.modal-close {
+  background:none; border:none; color:#fff;
+  font-size:1.3rem; cursor:pointer; line-height:1;
+}
+.modal-body { padding:20px; }
+.modal-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media(max-width:480px){ .modal-grid { grid-template-columns:1fr; } }
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:24px; right:24px; z-index:999;
+  padding:12px 20px; border-radius:10px; font-weight:600;
+  font-size:.85rem; opacity:0; transform:translateY(10px);
+  transition:all .3s; pointer-events:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.toast.show { opacity:1; transform:translateY(0); }
+.toast.ok  { background:#065f46; color:#6ee7b7; border:1px solid #059669; }
+.toast.err { background:#7f1d1d; color:#fca5a5; border:1px solid #dc2626; }
+
+/* ── EXPORT BUTTONS ROW ── */
+.export-row { display:flex; gap:8px; margin-top:14px; }
+.export-row .btn { margin:0; }
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align:center; padding:40px 20px;
+  color:var(--text2); font-size:.88rem;
+}
+.empty-icon { font-size:2.5rem; margin-bottom:10px; }
+
+/* ── BADGE ── */
+.badge {
+  display:inline-block; padding:2px 8px;
+  border-radius:20px; font-size:.7rem; font-weight:700;
+  background:rgba(124,58,237,.2); color:#a78bfa;
+  margin-left:6px;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">🐄 Sistema Ganadero Profesional</div>
+  <div class="topbar-meta" id="barra-tc">USD: ${{ tipo_cambio }} | {{ fecha_hoy }}</div>
+</div>
+<div class="leyenda">⬛ Los campos en NARANJA se calculan automáticamente</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('animales')">🐄 Animales</div>
+  <div class="tab" onclick="showTab('grupos')">🐑 Grupos</div>
+  <div class="tab" onclick="showTab('calc')">🧮 Calculadora</div>
+  <div class="tab" onclick="showTab('registros-animales')">📋 Reg. Animales</div>
+  <div class="tab" onclick="showTab('registros-grupos')">📋 Reg. Grupos</div>
+</div>
+
+<div class="content">
+
+<!-- ══════════════ TAB ANIMALES ══════════════ -->
+<div id="tab-animales">
+  <div class="grid3">
+    <div class="panel">
+      <div class="panel-header">🐄 Registro de Animal</div>
+      <div class="panel-body">
+        <div class="campo"><label>Fecha</label><input id="a-fecha" type="text"></div>
+        <div class="campo"><label>Tipo</label><input id="a-tipo" placeholder="Vaca, Novillo..."></div>
+        <div class="campo"><label>Raza</label><input id="a-raza" placeholder="Hereford, Angus..."></div>
+        <div class="campo"><label>Peso (kg)</label><input id="a-peso" type="number" placeholder="0"></div>
+        <div class="campo"><label>Precio por kilo</label><input id="a-pkilo" type="number" placeholder="0"></div>
+        <div class="campo"><label>Años</label><input id="a-anos" type="number" placeholder="0"></div>
+        <div class="divider"></div>
+        <div class="section-label">Costos</div>
+        <div class="campo"><label>Importe</label><input id="a-importe" type="number" placeholder="0" oninput="calcAnimal()"></div>
+        <div class="campo"><label>Comisión</label><input id="a-comision" type="number" placeholder="0" oninput="calcAnimal()"></div>
+        <div class="campo"><label>Transporte</label><input id="a-transporte" type="number" placeholder="0" oninput="calcAnimal()"></div>
+        <div class="campo"><label>Alimentación</label><input id="a-alimento" type="number" placeholder="0" oninput="calcAnimal()"></div>
+        <div class="campo"><label>Ayudante</label><input id="a-ayudante" type="number" placeholder="0" oninput="calcAnimal()"></div>
+        <div class="divider"></div>
+        <div class="section-label calc">Resultados Automáticos</div>
+        <div class="campo"><label class="calc-label">Precio Total $</label><input id="a-total" class="calc-input" readonly></div>
+        <div class="campo"><label class="calc-label">Precio USD</label><input id="a-usd" class="calc-input" readonly></div>
+        <div class="divider"></div>
+        <button class="btn btn-green"  onclick="guardarAnimal()">💾 Guardar Animal</button>
+        <button class="btn btn-orange" onclick="limpiarAnimal()">🧹 Limpiar</button>
+      </div>
+    </div>
+    <div></div><!-- espacio centro en desktop -->
+    <div class="panel" style="align-self:start">
+      <div class="panel-header">ℹ️ Instrucciones</div>
+      <div class="panel-body" style="color:var(--text2);font-size:.85rem;line-height:1.7">
+        <p>1. Completá los datos del animal</p>
+        <p>2. Los <span style="color:var(--calc-fg);font-weight:700">campos naranjas</span> se calculan solos</p>
+        <p>3. Presioná <b style="color:#6ee7b7">Guardar Animal</b></p>
+        <p>4. Revisá los registros en la pestaña <b>Reg. Animales</b></p>
+        <div class="divider"></div>
+        <p style="font-size:.75rem;color:var(--text2)">Los datos se guardan en la nube y son accesibles desde cualquier dispositivo.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TAB GRUPOS ══════════════ -->
+<div id="tab-grupos" style="display:none">
+  <div class="grid3">
+    <div class="panel">
+      <div class="panel-header">🐑 Grupo de Animales</div>
+      <div class="panel-body">
+        <div class="campo"><label>Fecha</label><input id="g-fecha" type="text"></div>
+        <div class="campo"><label>Cantidad de animales</label><input id="g-cantidad" type="number" placeholder="0" oninput="calcGrupo()"></div>
+        <div class="campo"><label>Tipo</label><input id="g-tipo" placeholder="Vacas, Novillos..."></div>
+        <div class="campo"><label>Raza</label><input id="g-raza" placeholder="Hereford, Angus..."></div>
+        <div class="campo"><label>Peso Total (kg)</label><input id="g-peso" type="number" placeholder="0"></div>
+        <div class="campo"><label>P.P.</label><input id="g-pp" placeholder="0"></div>
+        <div class="campo"><label>Precio por kilo</label><input id="g-pkilo" type="number" placeholder="0"></div>
+        <div class="campo"><label>Años</label><input id="g-anos" type="number" placeholder="0"></div>
+        <div class="divider"></div>
+        <div class="section-label">Costos</div>
+        <div class="campo"><label>Importe</label><input id="g-importe" type="number" placeholder="0" oninput="calcGrupo()"></div>
+        <div class="campo"><label>Comisión</label><input id="g-comision" type="number" placeholder="0" oninput="calcGrupo()"></div>
+        <div class="divider"></div>
+        <div class="section-label calc">Resultados Automáticos</div>
+        <div class="campo"><label class="calc-label">Precio Líquido (Importe + Comisión)</label><input id="g-liquido" class="calc-input" readonly></div>
+        <div class="campo"><label>Transporte</label><input id="g-transporte" type="number" placeholder="0" oninput="calcGrupo()"></div>
+        <div class="campo"><label>Ayudante</label><input id="g-ayudante" type="number" placeholder="0" oninput="calcGrupo()"></div>
+        <div class="campo"><label>Alimentación</label><input id="g-alimento" type="number" placeholder="0" oninput="calcGrupo()"></div>
+        <div class="campo"><label class="calc-label">Precio Total $</label><input id="g-total" class="calc-input" readonly></div>
+        <div class="campo"><label class="calc-label">Precio por Unidad $</label><input id="g-unidad" class="calc-input" readonly></div>
+        <div class="campo"><label class="calc-label">Precio USD por Unidad</label><input id="g-usd" class="calc-input" readonly></div>
+        <div class="divider"></div>
+        <button class="btn btn-green"  onclick="guardarGrupo()">💾 Guardar Grupo</button>
+        <button class="btn btn-orange" onclick="limpiarGrupo()">🧹 Limpiar</button>
+      </div>
+    </div>
+    <div></div>
+    <div></div>
+  </div>
+</div>
+
+<!-- ══════════════ TAB CALCULADORA ══════════════ -->
+<div id="tab-calc" style="display:none">
+  <div class="grid3">
+    <div class="panel">
+      <div class="panel-header">⚙️ Tipo de Cambio</div>
+      <div class="panel-body">
+        <div class="campo"><label>1 USD = $ pesos</label><input id="tc-valor" type="number" step="0.01"></div>
+        <button class="btn btn-purple" onclick="guardarTC()">💾 Guardar tipo de cambio</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">💵 Calculadora de Venta</div>
+      <div class="panel-body">
+        <div class="campo"><label>Precio base $</label><input id="c-base" type="number" placeholder="0" oninput="calcVenta()"></div>
+        <div class="campo"><label class="calc-label">Comisión 2.5%</label><input id="c-com" class="calc-input" readonly></div>
+        <div class="campo"><label class="calc-label">Precio venta $</label><input id="c-total" class="calc-input" readonly></div>
+        <div class="campo"><label class="calc-label">Precio en USD</label><input id="c-usd" class="calc-input" readonly></div>
+        <button class="btn btn-orange" onclick="limpiarCalc()">🧹 Limpiar</button>
+        <div class="divider"></div>
+        <div class="section-label">Conversor Pesos → USD</div>
+        <div class="campo"><label>Monto en Pesos $</label><input id="conv-p" type="number" placeholder="0" oninput="convertir()"></div>
+        <div class="campo"><label class="calc-label">Equivalente USD</label><input id="conv-u" class="calc-input" readonly></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">📦 Exportar Registros</div>
+      <div class="panel-body">
+        <div class="section-label">Animales</div>
+        <button class="btn btn-dark-green" onclick="window.location='/exportar/animales/excel'">📊 Excel - Animales</button>
+        <button class="btn btn-blue"       onclick="window.location='/exportar/animales/pdf'">📄 PDF - Animales</button>
+        <div class="divider"></div>
+        <div class="section-label">Grupos</div>
+        <button class="btn btn-dark-green" onclick="window.location='/exportar/grupos/excel'">📊 Excel - Grupos</button>
+        <button class="btn btn-blue"       onclick="window.location='/exportar/grupos/pdf'">📄 PDF - Grupos</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TAB REGISTROS ANIMALES ══════════════ -->
+<div id="tab-registros-animales" style="display:none">
+  <div class="panel">
+    <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+      <span>📋 Registros de Animales <span class="badge" id="badge-a">0</span></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm edit" style="padding:5px 12px" onclick="window.location='/exportar/animales/excel'">Excel</button>
+        <button class="btn-sm" style="padding:5px 12px;background:#1e3a8a;color:#93c5fd" onclick="window.location='/exportar/animales/pdf'">PDF</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="tabla-wrap">
+        <table id="tabla-animales">
+          <thead><tr>
+            <th>Fecha</th><th>Tipo</th><th>Raza</th><th>Peso</th>
+            <th>P.Kilo</th><th>Años</th><th>Importe</th><th>Comisión</th>
+            <th>Transporte</th><th>Alimento</th><th>Ayudante</th>
+            <th>Total $</th><th>USD</th><th>Acciones</th>
+          </tr></thead>
+          <tbody id="tbody-animales"></tbody>
+        </table>
+      </div>
+      <div id="empty-animales" class="empty" style="display:none">
+        <div class="empty-icon">🐄</div>
+        <div>No hay animales registrados todavía</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TAB REGISTROS GRUPOS ══════════════ -->
+<div id="tab-registros-grupos" style="display:none">
+  <div class="panel">
+    <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+      <span>📋 Registros de Grupos <span class="badge" id="badge-g">0</span></span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-sm edit" style="padding:5px 12px" onclick="window.location='/exportar/grupos/excel'">Excel</button>
+        <button class="btn-sm" style="padding:5px 12px;background:#1e3a8a;color:#93c5fd" onclick="window.location='/exportar/grupos/pdf'">PDF</button>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="tabla-wrap">
+        <table id="tabla-grupos">
+          <thead><tr>
+            <th>Fecha</th><th>Cant</th><th>Tipo</th><th>Raza</th>
+            <th>Peso T.</th><th>P.P.</th><th>P.Kilo</th><th>Años</th>
+            <th>Importe</th><th>Comisión</th><th>P.Líquido</th>
+            <th>Transporte</th><th>Ayudante</th><th>Alimento</th>
+            <th>Total $</th><th>Unidad $</th><th>USD</th><th>Acciones</th>
+          </tr></thead>
+          <tbody id="tbody-grupos"></tbody>
+        </table>
+      </div>
+      <div id="empty-grupos" class="empty" style="display:none">
+        <div class="empty-icon">🐑</div>
+        <div>No hay grupos registrados todavía</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<!-- ══════════════ MODAL EDITAR ANIMAL ══════════════ -->
+<div class="modal-overlay" id="modal-animal">
+  <div class="modal">
+    <div class="modal-header">
+      <span>✏️ Editar Animal</span>
+      <button class="modal-close" onclick="cerrarModal('modal-animal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-a-id">
+      <div class="modal-grid">
+        <div class="campo"><label>Fecha</label><input id="edit-a-fecha"></div>
+        <div class="campo"><label>Tipo</label><input id="edit-a-tipo"></div>
+        <div class="campo"><label>Raza</label><input id="edit-a-raza"></div>
+        <div class="campo"><label>Peso</label><input id="edit-a-peso" type="number"></div>
+        <div class="campo"><label>Precio Kilo</label><input id="edit-a-pkilo" type="number"></div>
+        <div class="campo"><label>Años</label><input id="edit-a-anos" type="number"></div>
+        <div class="campo"><label>Importe</label><input id="edit-a-importe" type="number"></div>
+        <div class="campo"><label>Comisión</label><input id="edit-a-comision" type="number"></div>
+        <div class="campo"><label>Transporte</label><input id="edit-a-transporte" type="number"></div>
+        <div class="campo"><label>Alimentación</label><input id="edit-a-alimento" type="number"></div>
+        <div class="campo"><label>Ayudante</label><input id="edit-a-ayudante" type="number"></div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn btn-green" onclick="guardarEditAnimal()">💾 Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MODAL EDITAR GRUPO ══════════════ -->
+<div class="modal-overlay" id="modal-grupo">
+  <div class="modal">
+    <div class="modal-header">
+      <span>✏️ Editar Grupo</span>
+      <button class="modal-close" onclick="cerrarModal('modal-grupo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-g-id">
+      <div class="modal-grid">
+        <div class="campo"><label>Fecha</label><input id="edit-g-fecha"></div>
+        <div class="campo"><label>Cantidad</label><input id="edit-g-cantidad" type="number"></div>
+        <div class="campo"><label>Tipo</label><input id="edit-g-tipo"></div>
+        <div class="campo"><label>Raza</label><input id="edit-g-raza"></div>
+        <div class="campo"><label>Peso Total</label><input id="edit-g-peso" type="number"></div>
+        <div class="campo"><label>P.P.</label><input id="edit-g-pp"></div>
+        <div class="campo"><label>Precio Kilo</label><input id="edit-g-pkilo" type="number"></div>
+        <div class="campo"><label>Años</label><input id="edit-g-anos" type="number"></div>
+        <div class="campo"><label>Importe</label><input id="edit-g-importe" type="number"></div>
+        <div class="campo"><label>Comisión</label><input id="edit-g-comision" type="number"></div>
+        <div class="campo"><label>Transporte</label><input id="edit-g-transporte" type="number"></div>
+        <div class="campo"><label>Ayudante</label><input id="edit-g-ayudante" type="number"></div>
+        <div class="campo"><label>Alimentación</label><input id="edit-g-alimento" type="number"></div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn btn-green" onclick="guardarEditGrupo()">💾 Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── UTILIDADES ──────────────────────────────────────────
+let TC = {{ tipo_cambio }};
+
+function v(id){ return parseFloat(document.getElementById(id).value)||0; }
+function s(id, val){ document.getElementById(id).value = val; }
+function fmt(n){ return new Intl.NumberFormat('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n); }
+function hoy(){ return new Date().toLocaleDateString('es-AR'); }
+
+function toast(msg, tipo='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${tipo} show`;
+  setTimeout(()=>{ t.className='toast'; }, 3000);
+}
+
+function showTab(name){
+  ['animales','grupos','calc','registros-animales','registros-grupos'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('active',
+      ['animales','grupos','calc','registros-animales','registros-grupos'][i]===name);
+  });
+  if(name==='registros-animales') cargarAnimales();
+  if(name==='registros-grupos')   cargarGrupos();
+}
+
+function cerrarModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+
+// ── TIPO DE CAMBIO ──────────────────────────────────────
+document.getElementById('tc-valor').value = TC;
+
+async function guardarTC(){
+  const val = parseFloat(document.getElementById('tc-valor').value)||6.96;
+  const r = await fetch('/api/config/tipo_cambio',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({valor: val})
+  });
+  const d = await r.json();
+  TC = d.tipo_cambio;
+  document.getElementById('barra-tc').textContent = `USD: $${TC} | ${hoy()}`;
+  toast(`Tipo de cambio guardado: $${TC}`);
+}
+
+// ── CALCULAR ANIMAL ─────────────────────────────────────
+function calcAnimal(){
+  const total = v('a-importe')+v('a-comision')+v('a-transporte')+v('a-alimento')+v('a-ayudante');
+  s('a-total', fmt(total));
+  s('a-usd',   fmt(total/TC));
+}
+
+// ── CALCULAR GRUPO ──────────────────────────────────────
+function calcGrupo(){
+  const imp  = v('g-importe'), com = v('g-comision');
+  const tr   = v('g-transporte'), ay = v('g-ayudante'), al = v('g-alimento');
+  const cant = v('g-cantidad') || 1;
+  const liq   = imp + com;
+  const total = liq + tr + ay + al;
+  const unidad= total / cant;
+  s('g-liquido', fmt(liq));
+  s('g-total',   fmt(total));
+  s('g-unidad',  fmt(unidad));
+  s('g-usd',     fmt(unidad/TC));
+}
+
+// ── CALCULADORA VENTA ───────────────────────────────────
+function calcVenta(){
+  const p = v('c-base'), c = p*0.025, t = p+c;
+  s('c-com',   fmt(c));
+  s('c-total', fmt(t));
+  s('c-usd',   fmt(t/TC));
+}
+function convertir(){
+  s('conv-u', fmt(v('conv-p')/TC));
+}
+function limpiarCalc(){
+  ['c-base','c-com','c-total','c-usd'].forEach(id=>s(id,''));
+}
+
+// ── GUARDAR ANIMAL ──────────────────────────────────────
+async function guardarAnimal(){
+  const data = {
+    fecha: document.getElementById('a-fecha').value,
+    tipo:  document.getElementById('a-tipo').value,
+    raza:  document.getElementById('a-raza').value,
+    peso:  document.getElementById('a-peso').value,
+    precio_kilo: document.getElementById('a-pkilo').value,
+    anos:  document.getElementById('a-anos').value,
+    importe:     v('a-importe'), comision:    v('a-comision'),
+    transporte:  v('a-transporte'), alimentacion: v('a-alimento'),
+    ayudante:    v('a-ayudante')
+  };
+  const r = await fetch('/api/animales',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  if((await r.json()).ok){
+    toast('Animal guardado correctamente');
+    limpiarAnimal();
+  } else { toast('Error al guardar','err'); }
+}
+
+function limpiarAnimal(){
+  ['a-fecha','a-tipo','a-raza','a-peso','a-pkilo','a-anos',
+   'a-importe','a-comision','a-transporte','a-alimento','a-ayudante',
+   'a-total','a-usd'].forEach(id=>s(id,''));
+  document.getElementById('a-fecha').value = hoy();
+}
+
+// ── GUARDAR GRUPO ───────────────────────────────────────
+async function guardarGrupo(){
+  const data = {
+    fecha: document.getElementById('g-fecha').value,
+    cantidad: v('g-cantidad')||1,
+    tipo:  document.getElementById('g-tipo').value,
+    raza:  document.getElementById('g-raza').value,
+    peso_total: document.getElementById('g-peso').value,
+    pp:    document.getElementById('g-pp').value,
+    precio_kilo: document.getElementById('g-pkilo').value,
+    anos:  document.getElementById('g-anos').value,
+    importe: v('g-importe'), comision: v('g-comision'),
+    transporte: v('g-transporte'), ayudante: v('g-ayudante'),
+    alimentacion: v('g-alimento')
+  };
+  const r = await fetch('/api/grupos',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  if((await r.json()).ok){
+    toast('Grupo guardado correctamente');
+    limpiarGrupo();
+  } else { toast('Error al guardar','err'); }
+}
+
+function limpiarGrupo(){
+  ['g-fecha','g-cantidad','g-tipo','g-raza','g-peso','g-pp','g-pkilo','g-anos',
+   'g-importe','g-comision','g-liquido','g-transporte','g-ayudante','g-alimento',
+   'g-total','g-unidad','g-usd'].forEach(id=>s(id,''));
+  document.getElementById('g-fecha').value = hoy();
+}
+
+// ── CARGAR TABLA ANIMALES ───────────────────────────────
+async function cargarAnimales(){
+  const data = await (await fetch('/api/animales')).json();
+  const tbody = document.getElementById('tbody-animales');
+  const empty = document.getElementById('empty-animales');
+  document.getElementById('badge-a').textContent = data.length;
+  if(!data.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = data.map(a=>`
+    <tr>
+      <td>${a.fecha||''}</td><td>${a.tipo||''}</td><td>${a.raza||''}</td>
+      <td>${a.peso||''}</td><td>${a.precio_kilo||''}</td><td>${a.anos||''}</td>
+      <td>${fmt(a.importe)}</td><td>${fmt(a.comision)}</td>
+      <td>${fmt(a.transporte)}</td><td>${fmt(a.alimentacion)}</td><td>${fmt(a.ayudante)}</td>
+      <td style="color:var(--calc-fg);font-weight:700">${fmt(a.precio_total)}</td>
+      <td style="color:var(--calc-fg);font-weight:700">${fmt(a.precio_usd)}</td>
+      <td><div class="td-actions">
+        <button class="btn-sm edit" onclick="abrirEditAnimal(${a.id})">Editar</button>
+        <button class="btn-sm del"  onclick="eliminarAnimal(${a.id})">Borrar</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function eliminarAnimal(id){
+  if(!confirm('¿Eliminar este registro?')) return;
+  await fetch(`/api/animales/${id}`,{method:'DELETE'});
+  toast('Registro eliminado');
+  cargarAnimales();
+}
+
+async function abrirEditAnimal(id){
+  const data = await (await fetch('/api/animales')).json();
+  const a = data.find(x=>x.id===id);
+  if(!a) return;
+  s('edit-a-id',       a.id);
+  s('edit-a-fecha',    a.fecha);
+  s('edit-a-tipo',     a.tipo);
+  s('edit-a-raza',     a.raza);
+  s('edit-a-peso',     a.peso);
+  s('edit-a-pkilo',    a.precio_kilo);
+  s('edit-a-anos',     a.anos);
+  s('edit-a-importe',  a.importe);
+  s('edit-a-comision', a.comision);
+  s('edit-a-transporte',a.transporte);
+  s('edit-a-alimento', a.alimentacion);
+  s('edit-a-ayudante', a.ayudante);
+  document.getElementById('modal-animal').classList.add('open');
+}
+
+async function guardarEditAnimal(){
+  const id = document.getElementById('edit-a-id').value;
+  const data = {
+    fecha: document.getElementById('edit-a-fecha').value,
+    tipo:  document.getElementById('edit-a-tipo').value,
+    raza:  document.getElementById('edit-a-raza').value,
+    peso:  document.getElementById('edit-a-peso').value,
+    precio_kilo: document.getElementById('edit-a-pkilo').value,
+    anos:  document.getElementById('edit-a-anos').value,
+    importe:     parseFloat(document.getElementById('edit-a-importe').value)||0,
+    comision:    parseFloat(document.getElementById('edit-a-comision').value)||0,
+    transporte:  parseFloat(document.getElementById('edit-a-transporte').value)||0,
+    alimentacion:parseFloat(document.getElementById('edit-a-alimento').value)||0,
+    ayudante:    parseFloat(document.getElementById('edit-a-ayudante').value)||0,
+  };
+  await fetch(`/api/animales/${id}`,{
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  cerrarModal('modal-animal');
+  toast('Cambios guardados');
+  cargarAnimales();
+}
+
+// ── CARGAR TABLA GRUPOS ─────────────────────────────────
+async function cargarGrupos(){
+  const data = await (await fetch('/api/grupos')).json();
+  const tbody = document.getElementById('tbody-grupos');
+  const empty = document.getElementById('empty-grupos');
+  document.getElementById('badge-g').textContent = data.length;
+  if(!data.length){ tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = data.map(g=>`
+    <tr>
+      <td>${g.fecha||''}</td><td>${g.cantidad}</td><td>${g.tipo||''}</td><td>${g.raza||''}</td>
+      <td>${g.peso_total||''}</td><td>${g.pp||''}</td><td>${g.precio_kilo||''}</td><td>${g.anos||''}</td>
+      <td>${fmt(g.importe)}</td><td>${fmt(g.comision)}</td>
+      <td style="color:var(--calc-fg)">${fmt(g.precio_liquido)}</td>
+      <td>${fmt(g.transporte)}</td><td>${fmt(g.ayudante)}</td><td>${fmt(g.alimentacion)}</td>
+      <td style="color:var(--calc-fg);font-weight:700">${fmt(g.precio_total)}</td>
+      <td style="color:var(--calc-fg);font-weight:700">${fmt(g.precio_unidad)}</td>
+      <td style="color:var(--calc-fg);font-weight:700">${fmt(g.precio_usd)}</td>
+      <td><div class="td-actions">
+        <button class="btn-sm edit" onclick="abrirEditGrupo(${g.id})">Editar</button>
+        <button class="btn-sm del"  onclick="eliminarGrupo(${g.id})">Borrar</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function eliminarGrupo(id){
+  if(!confirm('¿Eliminar este registro?')) return;
+  await fetch(`/api/grupos/${id}`,{method:'DELETE'});
+  toast('Registro eliminado');
+  cargarGrupos();
+}
+
+async function abrirEditGrupo(id){
+  const data = await (await fetch('/api/grupos')).json();
+  const g = data.find(x=>x.id===id);
+  if(!g) return;
+  s('edit-g-id',         g.id);
+  s('edit-g-fecha',      g.fecha);
+  s('edit-g-cantidad',   g.cantidad);
+  s('edit-g-tipo',       g.tipo);
+  s('edit-g-raza',       g.raza);
+  s('edit-g-peso',       g.peso_total);
+  s('edit-g-pp',         g.pp);
+  s('edit-g-pkilo',      g.precio_kilo);
+  s('edit-g-anos',       g.anos);
+  s('edit-g-importe',    g.importe);
+  s('edit-g-comision',   g.comision);
+  s('edit-g-transporte', g.transporte);
+  s('edit-g-ayudante',   g.ayudante);
+  s('edit-g-alimento',   g.alimentacion);
+  document.getElementById('modal-grupo').classList.add('open');
+}
+
+async function guardarEditGrupo(){
+  const id = document.getElementById('edit-g-id').value;
+  const data = {
+    fecha:    document.getElementById('edit-g-fecha').value,
+    cantidad: parseInt(document.getElementById('edit-g-cantidad').value)||1,
+    tipo:     document.getElementById('edit-g-tipo').value,
+    raza:     document.getElementById('edit-g-raza').value,
+    peso_total: document.getElementById('edit-g-peso').value,
+    pp:       document.getElementById('edit-g-pp').value,
+    precio_kilo: document.getElementById('edit-g-pkilo').value,
+    anos:     document.getElementById('edit-g-anos').value,
+    importe:     parseFloat(document.getElementById('edit-g-importe').value)||0,
+    comision:    parseFloat(document.getElementById('edit-g-comision').value)||0,
+    transporte:  parseFloat(document.getElementById('edit-g-transporte').value)||0,
+    ayudante:    parseFloat(document.getElementById('edit-g-ayudante').value)||0,
+    alimentacion:parseFloat(document.getElementById('edit-g-alimento').value)||0,
+  };
+  await fetch(`/api/grupos/${id}`,{
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  cerrarModal('modal-grupo');
+  toast('Cambios guardados');
+  cargarGrupos();
+}
+
+// ── CERRAR MODAL CON CLICK AFUERA ───────────────────────
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click', e=>{ if(e.target===el) el.classList.remove('open'); });
+});
+
+// ── INIT ────────────────────────────────────────────────
+document.getElementById('a-fecha').value = hoy();
+document.getElementById('g-fecha').value = hoy();
+</script>
+</body>
+</html>
