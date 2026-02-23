@@ -386,6 +386,17 @@ with app.app_context():
 @app.route('/static/<path:filename>')
 def static_files(filename):
     return send_file(f'static/{filename}')
+
+@app.route('/sw.js')
+def service_worker():
+    response = send_file('static/sw.js')
+    response.headers['Cache-Control'] = 'no-cache'
+    response.headers['Service-Worker-Allowed'] = '/'
+    return response
+
+@app.route('/manifest.json')
+def manifest():
+    return send_file('static/manifest.json')
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
