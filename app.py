@@ -383,7 +383,9 @@ def exportar_grupos_pdf():
 
 with app.app_context():
     db.create_all()
-
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_file(f'static/{filename}')
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
